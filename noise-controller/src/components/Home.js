@@ -1,5 +1,4 @@
 // where the actual animals are disappearing and where we are measuring mic sensitivity 
-import React, {Component } from 'react';
 import React, { useState } from 'react';
 import ScoresList from './ScoresList';
 import { connect } from 'react-redux';
@@ -64,7 +63,7 @@ function Home(props) {
 
     return (
         <div>
-            <Nav />
+            Home
             <ScoresList  />
         </div>
     );

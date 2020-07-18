@@ -19,13 +19,18 @@ import { Container } from 'semantic-ui-react';
 
 const ContStyled = styled.div`
   padding: 2rem;
+
+  @media only screen and (max-width: 768px){
+    padding: 2rem .4rem;
+    
+  }
 `;
 
 function App() {
   return (
     
 
-    <ContStyled as={Container} textAlign="center" fluid>
+    <ContStyled as={Container} textAlign="center">
 
     <Router>
 
@@ -33,11 +38,18 @@ function App() {
       <Nav/>
 
       <Switch> 
+        
         <Route 
+          exact
+          path='/signup'
+          component={props => <Signup {...props} />}
+        />
+
+        {/* <Route 
           exact
           path='/'
           component={props => <AnimalPage {...props} />}
-        />
+        /> */}
 
         <Route
           exact

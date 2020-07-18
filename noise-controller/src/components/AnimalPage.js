@@ -194,19 +194,20 @@ import Timer from "./Timer";
     };
 
     return (
-        <div>
+        <div className="home">
         <Screen>
-            <Animals />
+            
 
-            <Timer
+            
+        </Screen>
+        <Timer
             visible={visible}
             setVisible={setVisible}
-            micSensitivity={micSensitivity}
+            micSensitivity={"4"}
             animalChangeTime={animalChangeTime}
             scattered={scattering}
             sendEmScattering={sendEmScattering}
-            />
-        </Screen>
+        />
         </div>
     );
     }

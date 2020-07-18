@@ -7,7 +7,6 @@ const Settings = props => {
 
     return (
         <>
-        <Nav />
         <div className='settings-container'>
             <h1>Settings</h1>
             <div className='settings-row'>
