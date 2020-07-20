@@ -1,16 +1,33 @@
 import React, { useState } from 'react';
 import axiosWithAuth from '../axiosWithAuth';
+import styled from "styled-components";
+
+import { Form, Input, Select, Button, Message, Grid, Container, Header, Divider, Segment } from "semantic-ui-react";
+
+const grades = [
+  {key:"0", name:"grade", text:"Kindergarten", value: "Kindergarten"},
+  {key:"1", text:"First Grade", value: "First Grade"},
+  {key:"2", text:"Second Grade", value: "Second Grade"},
+  {key:"3", text:"Third Grade", value: "Third Grade"},
+  {key:"4", text:"Fourth Grade", value: "Fourth Grade"},
+  {key:"5", text:"Fifth grade", value: "Fifth grade"},
+  {key:"o", text:"Other", value:"Other"}
+
+]
 
 
 const ClassSignUp = props => {
 
 const [classSignupCreds, setClassSignupCreds] = useState({
-    name: "",
-    teacherId: "",
-    grade: ""
+    className: "",
+    theme: "Farm",
+    grade: "Kindergarten",
+    numberOfKids: "" ,
+
   });
 
   const handleChange = e => {
+
     setClassSignupCreds({
       ...classSignupCreds,
       [e.target.name]: e.target.value,
@@ -18,23 +35,31 @@ const [classSignupCreds, setClassSignupCreds] = useState({
     });
   };
 
+  const handleSelect = (e,results) => {
+    setClassSignupCreds({
+      ...classSignupCreds,
+      [results.name]: results.value
+    })
+  }
+
   const signup = () => {
-    axiosWithAuth()
-      .post(`https://noise-controller-backend.herokuapp.com/api/classes`, {
-        name: classSignupCreds.name,
-        teacherId: classSignupCreds.teacherId,
-        grade: classSignupCreds.grade
-      })
-      .then(res => {
-        localStorage.setItem("token", res.data.payload);
-        props.history.push("/home");
-      })
-      .catch(err =>
-        setClassSignupCreds({
-          ...classSignupCreds,
-          err: "Error creating class. Please try again."
-        })
-      );
+    // axiosWithAuth()
+    //   .post(`https://noise-controller-backend.herokuapp.com/api/classes`, {
+    //     name: classSignupCreds.name,
+    //     teacherId: classSignupCreds.teacherId,
+    //     grade: classSignupCreds.grade
+    //   })
+    //   .then(res => {
+    //     localStorage.setItem("token", res.data.payload);
+    //     props.history.push("/home");
+    //   })
+    //   .catch(err =>
+    //     setClassSignupCreds({
+    //       ...classSignupCreds,
+    //       err: "Error creating class. Please try again."
+    //     })
+    //   );
+    console.log(classSignupCreds)
   };
 
   const handleSubmit = e => {
@@ -48,39 +73,63 @@ const [classSignupCreds, setClassSignupCreds] = useState({
   };
 
   return (
-    <div className="classSignup-page">
-    <form>
-        <h4>Enter Class Info</h4>
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter class name..."
-          value={classSignupCreds.name}
+    <Segment>
+      
+        
+        <Header as="h3" textAlign="center">Add a New Class</Header>
+        <Divider/>
+      <Form>
+        <Form.Field
+          control={Input}
+          label="Class Name"
+          placeholder="Class Name"
+          name="className"
+          value={classSignupCreds.className}
           onChange={handleChange}
-          autoComplete="name"
         />
-        <input
-          type="text"
-          name="teacherId"
-          placeholder="Enter teacher ID..."
-          value={classSignupCreds.teacherId}
+        
+        <Form.Field
+          control={Input}
+          type="number"
+          min="1"
+          label="Students"
+          name="numberOfKids"
+          placeholder="How many students"
+          value={classSignupCreds.numberOfKids}
           onChange={handleChange}
-          autoComplete="teacher-Id"
         />
-        <input
-          type="text"
+        
+        <Form.Field
+          label="Grade"
+          control={Select}
+          options={grades}
+          placeholder="Grade"
           name="grade"
-          placeholder="Enter grade level..."
           value={classSignupCreds.grade}
-          onChange={handleChange}
-          autoComplete="grade-level"
+          onChange={handleSelect}
         />
-        <button onClick={handleSubmit}>Submit</button>
-        {classSignupCreds.err && (
-          <div className="error-container">{classSignupCreds.err}</div>
-        )}
-      </form>
-    </div>
+
+        <Form.Field
+          label="Theme"
+          control={Select}
+          disabled
+          options={[{key:"farm", text:"Farm - More coming soon!", value: "Farm"}]}
+          name="theme"
+          placeholder="Theme"
+          value={classSignupCreds.theme}
+          onChange={handleSelect}
+        />
+        
+        {false && <Message
+          error
+          header="Action"
+          content="HUHH"
+        />}
+        
+        <Form.Field onClick={handleSubmit} control={Button} color="primary">Submit</Form.Field>
+        
+      </Form>
+    </Segment>
   );
 };
 export default ClassSignUp;
