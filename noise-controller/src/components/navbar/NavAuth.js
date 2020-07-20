@@ -1,21 +1,21 @@
 import React from "react";
+import {connect} from "react-redux" 
 import { Link } from 'react-router-dom';
 
 import NavSettings from "./NavSettings.js";
+import {selectCurrentClass} from "../../actions/classesAction";
 
 import {  Menu, Dropdown, Icon } from 'semantic-ui-react';
-import {connect} from "react-redux"
 
 function NavAuth(props) {
   const [isMobile, setMobile] = React.useState(getWindowWidth())
-  const [selectedClass, setSelectedClass] = React.useState("")
+ 
 
-  React.useEffect(()=>{
+  // React.useEffect(()=>{
 
-    setSelectedClass(props.selectedClass.name)
-    
+  //   setSelectedClass(props.selectedClass.className)
 
-  },[props.selectedClass])
+  // },[props.selectedClass])
   
   React.useEffect(()=>{
     
@@ -37,8 +37,9 @@ function NavAuth(props) {
   function changeClass(cls) {
     console.log("class picked",cls)
     //action for currently Selected Class
-    setSelectedClass(cls.name)
+    props.selectCurrentClass(cls)
   }
+
 
   // Will check if there is a token as well
   if(props.account && localStorage.getItem("token")){
@@ -47,7 +48,7 @@ function NavAuth(props) {
       <>
       <Dropdown
         item 
-        text={isMobile ? `${selectedClass.slice(0,10)}...`: selectedClass}
+        text={!props.selectedClass.className ? "Class" :  isMobile ? `${props.selectedClass.className.slice(0,10)}...`: props.selectedClass.className}
         simple
         scrolling
       >
@@ -62,15 +63,15 @@ function NavAuth(props) {
           >
             All Classes
           </Menu.Item>
-          {props.classes.map(cls=>{
+          {props.classes ? props.classes.map(cls=>{
             return(
             <Menu.Item
               onClick={()=>changeClass(cls)}
             >
-              {cls.name}
+              {cls.className}
             </Menu.Item>
             )
-          })}
+          }): ""}
 
         </Menu.Menu>
 
@@ -125,4 +126,4 @@ const mapStatetoProps = state=>({
   selectedClass: state.classReducer.selectedClass
 })
 
-export default connect(mapStatetoProps,{})(NavAuth)
+export default connect(mapStatetoProps,{selectCurrentClass})(NavAuth)
