@@ -1,132 +1,153 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from 'react-router-dom';
-import { axiosWithAuth } from '../data/axiosAuth';
-import { Header, Button, Grid, Message, Segment } from 'semantic-ui-react';
+import { Form, Header, Button, Grid, Message, Segment } from 'semantic-ui-react';
+
+import { Formik } from "formik";
+import * as yup from "yup";
+
+
+const yupValidation = yup.object().shape({
+  email: yup.string().email("Please enter a valid email").required("Please enter your email"),
+  title: yup.string().required("Please enter your title"),
+  lastName: yup.string().required("Last Name is Required"),
+  password: yup.string().required("Please enter password").min(8, "Password must be at least 8 characters").oneOf([yup.ref("confirmPassword")], "Passwords must match"),
+  confirmPassword: yup.string().required("Please enter password").min(8, "Password must be at least 8 characters").oneOf([yup.ref("password")], "Passwords must match")
+})
+
+const title = [
+  {key:"0", text:"Dr.", value: "Dr."},
+  {key:"0", text:"Mr.", value: "Mr."},
+  {key:"0", text:"Mrs.", value: "Mrs."},
+  {key:"0", text:"Ms.", value: "Ms."},
+
+]
+
 
 const Signup = props => {
 
-const [signupCreds, setSignupCreds] = useState({
-    username: "",
-    password: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    // title: "",
-    err: null
-  });
 
-  const handleChange = e => {
-    setSignupCreds({
-      ...signupCreds,
-      [e.target.name]: e.target.value,
-      err: null
-    });
-  };
-
-  const signup = () => {
-    axiosWithAuth()
-      .post(`https://noise-controller-backend.herokuapp.com/api/teachers/register`, {
-        username: signupCreds.username,
-        password: signupCreds.password,
-        email: signupCreds.email,
-        // title: signupCreds.title,
-        firstName: signupCreds.firstName,
-        lastName: signupCreds.lastName,
-      })
-      .then(res => {
-        localStorage.setItem("token", res.data.payload);
-        props.history.push("/classform");
-      })
-      .catch(err =>
-        console.log(props)
-        // setSignupCreds({
-        //   ...signupCreds,
-        //   err: "Error signing up. Please try again."
-        // })
-      );
-  };
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    signupCreds.username === "" || signupCreds.password === ""
-      ? setSignupCreds({
-          ...signupCreds,
-          err: "Please complete all login fields."
-        })
-      : signup();
-  };
 
   return (
-    <Grid textAlign="center" style= {{ height: '100vh' }} verticalAlign="middle">
-      <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as='h2' style={{ color: '#2B4162' }}>
+    <Segment>
+      
+        <Header as='h1' textAlign="center">
           Sign Up
         </Header>
-          <form>
-            <Segment stacked>
-              <input
-                type="text"
-                name="firstName"
-                placeholder="Enter first name..."
-                value={signupCreds.firstName}
-                onChange={handleChange}
-                autoComplete="first name"
-              />
-              <input
-                type="text"
-                name="lastName"
-                placeholder="Enter last name..."
-                value={signupCreds.lastName}
-                onChange={handleChange}
-                autoComplete="last name"
-              />
-              <input
-                type="text"
-                name="username"
-                placeholder="Enter username..."
-                value={signupCreds.username}
-                onChange={handleChange}
-                autoComplete="username"
-              />
-              <input
-                type="text"
-                name="email"
-                placeholder="Enter email..."
-                value={signupCreds.email}
-                onChange={handleChange}
-                autoComplete="email"
-              />
-              <input
-                type="password"
-                name="password"
-                placeholder="Enter password..."
-                value={signupCreds.password}
-                onChange={handleChange}
-                autoComplete="current-password"
-              />
-              <Button
-                style={{
-                  color: 'white',
-                  backgroundColor: '#2B4162',
-                  marginTop: '10px'
-                }}
-                fluid
-                size='large'
-                type='submit'
-                onClick={handleSubmit}
-              >
-                Sign Up
-              </Button>
-                {signupCreds.err && (
-                  <div className="error-container">{signupCreds.err}</div>
-                )}
-            </Segment>
-          </form>
-          <Message>
-            Already have an account? <Link to='/login'>Log in</Link>
-          </Message>
-      </Grid.Column>
-    </Grid>
+
+        <Formik
+        initialValues={{
+          email: "",
+          firstName: "",
+          lastName: "",
+          password: "",
+          confirmPassword: "",
+        }}
+        validationSchema={yupValidation}
+        onSubmit={(values) => {
+          console.log(values)
+        }}
+        
+        validateOnChange={false}
+      >
+        {props => (
+          <Form>
+            <Form.Input
+              label="Email"
+              type="text"
+              name="email"
+              placeholder="Enter email..."
+              value={props.values.email}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              autoComplete="email"
+              error={props.errors.email}
+            />
+            <Form.Select
+              label="Title"
+              placeholder="Title"
+              name="title"
+              options={title}
+              value={props.values.title}
+              onChange={(e,results) => props.setFieldValue("title", results.value) && props.setErrors({})}
+              error={props.errors.title}
+              fluid
+            />
+            <Form.Input
+              label="First Name"
+              type="text"
+              name="firstName"
+              placeholder="Enter first name..."
+              value={props.values.firstName}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              autoComplete="first name"
+              error={props.errors.firstName}
+            />
+            <Form.Input
+              label="Last Name"
+              type="text"
+              name="lastName"
+              placeholder="Enter last name..."
+              value={props.values.lastName}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              autoComplete="last name"
+              error={props.errors.lastName}
+            />
+
+            <Form.Input
+              label="Password"
+              type="password"
+              name="password"
+              placeholder="Enter password..."
+              value={props.values.password}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              error={props.errors.password}
+            />
+            
+            <Form.Input
+              label="Confirm Password"
+              type="password"
+              name="confirmPassword"
+              placeholder="Confirm password..."
+              value={props.values.confirmPassword}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              error={props.errors.confirmPassword}
+            />
+
+            <Form.Button
+
+              fluid
+              color="teal"
+              size='large'
+              type='submit'
+              onClick={props.handleSubmit}
+              disabled={!Object.keys(props.errors).length == 0}
+            >
+              Submit
+            </Form.Button>
+            
+          </Form>
+          )}
+        </Formik>
+          
+        <Message size='big'>
+          Already have an account? <Link to='/login'>Login</Link>
+        </Message>
+      
+    </Segment>
   );
 };
 export default Signup;

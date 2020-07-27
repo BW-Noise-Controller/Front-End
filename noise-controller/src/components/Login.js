@@ -1,95 +1,89 @@
-import React, { useState } from "react";
+import React from "react";
+import axios from "axios";
 import { Link } from 'react-router-dom';
-import { Header, Button, Grid, Message, Segment } from 'semantic-ui-react';
-import { axiosWithAuth } from "../data/axiosAuth";
+import { Formik } from "formik";
+import * as yup from "yup";
+
+
+import { Header, Form, Message, Segment } from 'semantic-ui-react';
+
+
+const yupValidation = yup.object().shape({
+  email: yup.string().email("Please enter a valid email").required("Please enter your email"),
+  password: yup.string().min(8,"Password must be at least 8 characters").required("Please enter your password")
+})
 
 const Login = props => {
-const [loginCreds, setLoginCreds] = useState({
-    username: "",
-    password: "",
-    err: null
-  });
 
-  const handleChange = e => {
-    setLoginCreds({
-      ...loginCreds,
-      [e.target.name]: e.target.value,
-      err: null
-    });
-  };
 
-  const login = () => {
-    axiosWithAuth()
-      .post(`https://noise-controller-backend.herokuapp.com/api/teachers/login`, {
-        username: loginCreds.username,
-        password: loginCreds.password
-      })
-      .then(res => {
-        localStorage.setItem("token", res.data.payload);
-        props.history.push("/home");
-      })
-      .catch(err =>
-        setLoginCreds({
-          ...loginCreds,
-          err: "Error logging in. Please try again."
-        })
-      );
-  };
-
-  const handleSubmit = e => {
-    e.preventDefault();
-    loginCreds.username === "" || loginCreds.password === ""
-      ? setLoginCreds({
-          ...loginCreds,
-          err: "Please complete all login fields."
-        })
-      : login();
-  };
 
   return (
-    <Grid textAlign="center" style={{ height: '100vh' }} verticalAlign="middle">
-      <Grid.Column style={{ maxWidth: 450 }}>
-        <Header as="h2" style={{ color: '#2B4162' }} textAlign="center">Login</Header>
-            <form>
-                <Segment stacked>
-                    <input
-                    type="text"
-                    name="username"
-                    placeholder="Enter username..."
-                    value={loginCreds.username}
-                    onChange={handleChange}
-                    autoComplete="username"
-                    />
-                    <input
-                    type="password"
-                    name="password"
-                    placeholder="Enter password..."
-                    value={loginCreds.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                    />
-                    <Button
-                  style={{
-                    color: 'white',
-                    backgroundColor: '#2B4162',
-                    marginTop: '10px'
-                  }}
-                  fluid
-                  size="large"
-                  type="submit"
-                  onClick={handleSubmit}>
-                  Login
-                </Button>
-                    {loginCreds.err && (
-                    <div className="error-container">{loginCreds.err}</div>
-                    )}
-                </Segment>
-            </form>
-        <Message>
+    <Segment>
+      
+      <Header as="h1" textAlign="center">Login</Header>
+
+      <Formik
+        initialValues={{
+          email: "",
+          password: "",
+        }}
+        validationSchema={yupValidation}
+        onSubmit={(values) => {
+          console.log(values)
+        }}
+        
+        validateOnChange={false}
+      >
+        { props => (
+        
+          <Form>
+              
+            <Form.Input
+              label="Email"
+              type="email"
+              name="email"
+              placeholder="Enter email..."
+              value={props.values.email}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              autoComplete="email"
+              error={props.errors.email}
+            />
+            <Form.Input
+              label="Password"
+              type="password"
+              name="password"
+              placeholder="Enter password..."
+              value={props.values.password}
+              onChange={(e) => {
+                props.setErrors({})
+                props.handleChange(e)
+              }}
+              autoComplete="current-password"
+              error={props.errors.password}
+            />
+
+            <Form.Button
+              fluid
+              color="primary"
+              size="large"
+              type="submit"
+              onClick={props.handleSubmit}>
+              Submit
+            </Form.Button>
+              
+          </Form>
+        )}
+
+      </Formik>
+
+        <Message size='big'>
             New to us? <Link to='/signup'>Sign up</Link>
         </Message>
-      </Grid.Column>
-    </Grid>
+  
+    </Segment>
   );
 };
 export default Login;
