@@ -67,6 +67,7 @@ function NavAuth(props) {
             return(
             <Menu.Item
               onClick={()=>changeClass(cls)}
+              tabIndex="0"
             >
               {cls.className}
             </Menu.Item>
