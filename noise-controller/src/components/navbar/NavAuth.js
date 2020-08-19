@@ -42,7 +42,7 @@ function NavAuth(props) {
 
 
   // Will check if there is a token as well
-  if(props.account && localStorage.getItem("token")){
+  if(props.account.username && localStorage.getItem("token")){
 
     return (
       <>

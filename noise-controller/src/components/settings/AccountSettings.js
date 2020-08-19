@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React from "react";
 import {connect} from "react-redux";
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -35,42 +35,10 @@ const yupSchema = yup.object().shape({
     
 },[["password", "confirmPassword"]]);
 
-// (password, field) => 
-        // password ? field.required().min(8).oneOf([yup.ref("password")]): field
 
 function AccountSettings(props) {
 
 
-    useEffect(()=>{
-        // setUserCreds({
-        //     title: props.account.title,
-        //     firstName: props.account.firstName,
-        //     lastName: props.account.lastName,
-            
-        // })
-    },[props.account])
-
-    const handleSelect = (e,results) => {
-        // setUserCreds({
-        //   ...userCreds,
-        //   [results.name]: results.value
-        // })
-
-    }
-    
-    // const handleChange = e => {
-    //     setUserCreds({
-    //         ...userCreds,
-    //         [e.target.name]: e.target.value,
-    //     })
-    // }
-
-    // const handleSubmit = e => {
-    //     console.log("submit")
-    //     console.log(yupSchema)
-
-    //     // props.editAccount(userCreds)
-    // }
 
     const handleDelete = e => {
         console.log("delete")

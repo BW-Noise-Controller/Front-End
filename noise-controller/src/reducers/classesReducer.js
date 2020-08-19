@@ -1,42 +1,55 @@
-import * as actionTypes from "../actions";
+import {
+    ADD_CLASS_FETCH,
+    ADD_CLASS_SUCCESS,
+    ADD_CLASS_ERROR,
+    SELECT_CLASS_SUCCESS
+} from "../actions/classesAction.js"
 
 const initialState = {
-    classes: [{
-        "id": 1,
-        "name": "Second Grade",
-        "teacherId": 1,
-        "theme": "safari",
-        "grade": "2",
-        "numberOfKids": 25,
-        "streak": 3
-      },
-      {
-        "id": 2,
-        "name": "Afternoon Kindergarten",
-        "teacherId": 1,
-        "theme": "safari",
-        "grade": "Kindergarten",
-        "numberOfKids": 30,
-        "streak": 0
-      }],
+    classes: [],
     selectedClass: {
-        "id": 2,
-        "name": "Afternoon Kindergarten",
-        "teacherId": 1,
-        "theme": "safari",
-        "grade": "Kindergarten",
-        "numberOfKids": 30,
-        "streak": 0
-    }
+        "id": null,
+        "className": null,
+        "teacherId": null,
+        "theme": null,
+        "grade": "",
+        "numberOfKids": null,
+        "streak": null,
+    },
+    selectedClassScores: [],
+    error: {
+
+    },
+    fetching: false,
+
 }
 
 
 export const classReducer = (state = initialState, action) => {
     switch (action.type) {
-        case "Error":
+        case ADD_CLASS_FETCH:
             
-            break;
+            return {
+                ...state,
+                fetching: true
+            };
     
+        case ADD_CLASS_SUCCESS:
+            return {
+                ...state,
+                selectedClass: action.payload
+            };
+
+        case ADD_CLASS_ERROR:
+            return {
+                ...state,
+                error: action.payload
+            }
+        case SELECT_CLASS_SUCCESS: 
+            return {
+                ...state,
+                selectedClass: action.payload
+            }
         default:
             return state;
     }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
-import { Form, Header, Button, Grid, Message, Segment } from 'semantic-ui-react';
+import { Form, Header, Message, Segment } from 'semantic-ui-react';
 
 import { Formik } from "formik";
 import * as yup from "yup";
@@ -11,7 +11,7 @@ const yupValidation = yup.object().shape({
   title: yup.string().required("Please enter your title"),
   lastName: yup.string().required("Last Name is Required"),
   password: yup.string().required("Please enter password").min(8, "Password must be at least 8 characters").oneOf([yup.ref("confirmPassword")], "Passwords must match"),
-  confirmPassword: yup.string().required("Please enter password").min(8, "Password must be at least 8 characters").oneOf([yup.ref("password")], "Passwords must match")
+  confirmPassword: yup.string().required("Please confirm password").min(8, "Password must be at least 8 characters").oneOf([yup.ref("password")], "Passwords must match")
 })
 
 const title = [

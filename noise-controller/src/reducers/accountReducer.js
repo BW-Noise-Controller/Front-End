@@ -1,24 +1,42 @@
-import * as actionTypes from "../actions";
+import {
+    ADD_ACCOUNT_FETCH,
+    ADD_ACCOUNT_SUCCESS,
+    ADD_ACCOUNT_ERROR
+} from "../actions/accountAction.js";
 
 const initialState = {
-    username: "ADP",
-    id: 1,
-    email: "adrian.com",
-    firstName: "Adrian",
-    lastName: "Parra",
-    title: "Mr.",
-    theme: "farm",
-    gettingUser: false,
+    username: null,
+    id: null,
+    email: null,
+    firstName: null,
+    lastName: null,
+    title: null,
+    theme: null,
+    micSensitivity: 5,
+    fetching: false,
     error: null
 }
 
 
 export const accountReducer = (state = initialState, action) => {
     switch (action.type) {
-        case "Error":
-            
-            break;
-    
+        case ADD_ACCOUNT_FETCH:
+            return {
+                ...state,
+                fetching: true,
+                error: null
+            }
+        case ADD_ACCOUNT_SUCCESS:
+            return {
+                ...state,
+                fetching: false
+            }
+        case ADD_ACCOUNT_ERROR:
+            return {
+                ...state,
+                fetching: false,
+                error: action.payload
+            }
         default:
             return state;
     }

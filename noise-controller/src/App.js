@@ -7,11 +7,12 @@ import PrivateRoute from './components/PrivateRoute';
 import Logout from './components/Logout';
 import Login from './components/Login';
 import Home from './components/Home';
-import ScoreCard from './components/ScoreCard';
+import ScoreList from "./components/ScoresList";
+import Classes from "./components/classes/Classes";
 import ClassSignUp from './components/ClassSignUp';
-import Settings from './components/Settings';
+import Settings from './components/settings/Settings';
 import AnimalPage from './components/AnimalPage';
-import Nav from "./components/Nav.js";
+import NavBar from "./components/navbar/NavBar.js";
 
 import styled from "styled-components";
 import { Container } from 'semantic-ui-react';
@@ -30,15 +31,21 @@ function App() {
   return (
     
 
-    <ContStyled as={Container} textAlign="center">
+    <ContStyled as={Container}>
 
     <Router>
 
       
-      <Nav/>
+      <NavBar/>
 
       <Switch> 
         
+        <Route
+          exact
+          path="/login"
+          component={props => <Login {...props} />}
+        />
+         
         <Route 
           exact
           path='/signup'
@@ -51,11 +58,6 @@ function App() {
           component={props => <AnimalPage {...props} />}
         /> */}
 
-        <Route
-          exact
-          path="/login"
-          component={props => <Login {...props} />}
-        /> 
 
         <Route
           exact
@@ -63,10 +65,16 @@ function App() {
           component={props => <Logout {...props} />}
         />
 
-        <Route
+        <PrivateRoute
           exact
           path='/classform'
           component={props => <ClassSignUp {...props} />}
+        />
+
+        <PrivateRoute
+          exact
+          path='/classes/:className'
+          component={props => <ClassSignUp {...props}/>}
         />
 
         <PrivateRoute
@@ -83,10 +91,19 @@ function App() {
 
         <PrivateRoute
           exact
-          path='/scores'
-          component={props => <ScoreCard {...props} />}
+          path='/:className/scores'
+          component={props => <ScoreList {...props} />}
+        />
+        
+        <PrivateRoute
+          exact
+          path='/classes'
+          component={props => <Classes {...props} />}
         />
 
+        <Route path="*">
+          <div>Lost? Where are you?</div>
+        </Route>
 
       </Switch>
       

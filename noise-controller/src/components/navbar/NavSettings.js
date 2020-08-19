@@ -1,11 +1,12 @@
 import React from "react"
 import { connect } from "react-redux"
-import {Link ,useHistory, Redirect} from "react-router-dom"
+import {Link ,useHistory} from "react-router-dom"
 
 import { Menu } from "semantic-ui-react";
 
 function NavSettings(props) {
   const history = useHistory();
+
 
   const handleLogout = e => {
 
@@ -16,11 +17,12 @@ function NavSettings(props) {
             <Menu.Item
             //   onClick={handleMenuChange}
               onClick={ ()=> {
-                let path = "/"+props.selectedClassName + "/scores"
-                history.push(path)
+                let path = "/"+props.selectedClass.className + "/scores"
+                history.push(path ,props.selectedClass)
               }}
               tabindex="0"
               name="scores"
+              disabled={props.selectedClass.className ? false: true}
             />
   
             <Menu.Item
@@ -42,7 +44,7 @@ function NavSettings(props) {
 };
 
 const mapStatetoProps = state => ({ 
-    selectedClassName: state.classReducer.selectedClass.className
+    selectedClass: state.classReducer.selectedClass
 })
 
 export default connect(mapStatetoProps,{})(NavSettings);

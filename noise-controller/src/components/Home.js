@@ -1,9 +1,8 @@
 // where the actual animals are disappearing and where we are measuring mic sensitivity 
 import React, { useState } from 'react';
-import ScoresList from './ScoresList';
 import { connect } from 'react-redux';
 //import { deleteAnimal, updateSingleAnimal, toggleShowUpdate } from '../actions';
-import Nav from './Nav';
+
 
 // class Home extends Component {
 //     handleDeleteAnimal = () => {
@@ -64,7 +63,7 @@ function Home(props) {
     return (
         <div>
             Home
-            <ScoresList  />
+            
         </div>
     );
 }

@@ -27,9 +27,10 @@ const VolumeDisplay = styled.div`
     bottom: 0;
     margin-bottom: 15vh;
     z-index: 5;
-    text-align: left;
+    text-align: right;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000;
+    transform: rotate(180deg);
 `;
 
 const MeterDisplay = styled.div`
@@ -42,9 +43,10 @@ const MeterDisplay = styled.div`
     bottom: 0;
     margin-bottom: 15vh;
     z-index: 5;
-    text-align: right;
+    text-align: left;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000,
     1px 1px 0 #000;
+    transform: rotate(180deg);
 `;
 
 const ScoreDisplay = styled.div`
@@ -74,7 +76,7 @@ const StyledButton = styled.button`
     &:focus {
     outline: none;
     }
-    font-size: ${props => (props.shh ? "15rem" : "1.6rem")};
+    font-size: 1.6rem;
     z-index: 10000;
     background: ${props =>
     props.shh ? "transparent" : "rgba(255,255,255,0.75)"};
@@ -84,6 +86,7 @@ const StyledButton = styled.button`
     display: flex;
     justify-content: center;
     align-items: center;
+    cursor: pointer;
     `;
 
 function Timer({
@@ -97,6 +100,7 @@ function Timer({
     const [minutes, setMinutes] = useState(0);
     const [seconds, setSeconds] = useState(0);
     const [isActive, setIsActive] = useState(false);
+    const [audio, setAudio] = useState(false)
     const [score, setScore] = useState(100);
     const [scoreObject, setScoreObject] = useState({});
     const [volumeReading, setVolumeReading] = useState(0);
@@ -120,35 +124,47 @@ function Timer({
         }
     }
 
-    function toggle() {
+    function toggle(e) {
         if (!isActive) {
         setSeconds(0);
         setMinutes(0);
         startMic();
-        axios
-            .post(
-            "https://voicecontrollerbackendapi.herokuapp.com/api/scores/start",
-            {},
-            { headers: { Authorization: localStorage.token } }
-            )
-            .then(response => {
-            setScoreObject(response.data);
-            })
-            .catch();
-        } else {
-        reset();
-        window.localStream.getTracks().forEach(track => track.stop());
-        scoreObject.score_value = score;
-        axios
-            .put(
-            "https://voicecontrollerbackendapi.herokuapp.com/api/scores/end",
-            scoreObject,
-            { headers: { Authorization: localStorage.token } }
-            )
-            .then(response => {
+        console.log(e)
+        
+        // axios
+        //     .post(
+        //     "https://voicecontrollerbackendapi.herokuapp.com/api/scores/start",
+        //     {},
+        //     { headers: { Authorization: localStorage.token } }
+        //     )
+        //     .then(response => {
+        //     setScoreObject(response.data);
+        //     })
+        //     .catch();
+        // } else {
+        // reset();
+        // window.localStream.getTracks().forEach(track => track.stop());
+        // scoreObject.score_value = score;
+        // axios
+        //     .put(
+        //     "https://voicecontrollerbackendapi.herokuapp.com/api/scores/end",
+        //     scoreObject,
+        //     { headers: { Authorization: localStorage.token } }
+        //     )
+        //     .then(response => {
+        //     setScoreObject({});
+        //     setScore(100);
+        //     });
+        } else{
+            reset();
+            setVolumeReading(0)
+            console.log("track stop", window.localStream.getTracks())
+            
+            window.localStream.getTracks().forEach(track => track.stop());
+            
             setScoreObject({});
             setScore(100);
-            });
+            window.javascriptNode.disconnect();
         }
     }
 
@@ -156,10 +172,13 @@ function Timer({
         setIsActive(false);
         setSeconds(0);
         setMeterProgress(0);
+        setVolumeReading(0)
     }
 
     useEffect(() => {
         let interval = null;
+        console.log("volume reading", volumeReading)    
+        console.log("meter reading", meterProgress)
         if (isActive) {
         interval = setInterval(() => {
             if (seconds > 1 && !((seconds + 1) % animalChangeTime)) {
@@ -189,32 +208,41 @@ function Timer({
     // Adapted from www.0AV.com, LGPL license or as set by forked host, Travis Holliday
 
     function startMic() {
-        navigator.getUserMedia =
-        navigator.getUserMedia ||
-        navigator.webkitGetUserMedia ||
-        navigator.mozGetUserMedia;
-        if (navigator.getUserMedia) {
-        navigator.getUserMedia(
-            {
-            audio: true
-            },
-            function(stream) {
+
+        navigator.mediaDevices.getUserMedia({audio: true, video:false})
+        .then(function(stream) {
             setIsActive(true);
             window.localStream = stream;
             let audioContext = new AudioContext();
+           
+            
             let analyser = audioContext.createAnalyser();
+            window.analyser = analyser;
+
             let microphone = audioContext.createMediaStreamSource(stream);
+            window.microphone = microphone;
+
             let javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+            window.javascriptNode = javascriptNode;
 
             analyser.smoothingTimeConstant = 0.8;
             analyser.fftSize = 2048;
+            // if(!isActive){
+            //     console.log("analyserstop", analyser.disconnect())
+            //     microphone.disconnect(analyser);
+            //     analyser.disconnect(javascriptNode);
+            // }
 
             microphone.connect(analyser);
             analyser.connect(javascriptNode);
             javascriptNode.connect(audioContext.destination);
 
+            
+            
+
             javascriptNode.onaudioprocess = function() {
                 let array = new Uint8Array(analyser.frequencyBinCount);
+                console.log(analyser.frequencyBinCount)
                 analyser.getByteFrequencyData(array);
                 let values = 0;
 
@@ -227,54 +255,53 @@ function Timer({
                 setVolumeReading(volume);
                 if (volume > 100) {
                 microreadings += 1;
+                // console.log("microreading",microreadings)
                 setMeterProgress(microreadings);
                 //This is where the hide animal function will go
                 if (microreadings > 50) {
                     sendEmScattering(true);
                     microreadings = 0;
                     setScore(score => (score - 10 >= 0 ? score - 10 : 0));
-                    reset();
-                    setTimeout(() => {
-                    setVisible(0);
-                    sendEmScattering(false);
-                    setIsActive(true);
-                    }, 6000);
+                    
+                    // setTimeout(() => {
+                    // setVisible(0);
+                    // sendEmScattering(false);
+                    // setIsActive(true);
+                    // }, 6000);
                 }
                 } else {
                 //This is where the show animal function will go
                 }
             }; // end fn stream
-            },
-            function(err) {
+        })
+        .catch(function(err) {
+            console.log(err)
             alert("The following error occured: " + err.name);
-            }
-        );
-        } else {
-        alert("getUserMedia not supported");
-        }
+        })
+
+
     }
 
     return (
-        <div>
+        <>
         <TimerDisplay>
             TIME: {minutes.toString().padStart(2, "0")}:
             {seconds.toString().padStart(2, "0")}
             <StyledButton
             onClick={toggle}
-            style={{ cursor: "pointer" }}
-            shh={scattered}
+            
             >
-            {isActive ? "STOP" : !scattered ? "START" : "🤫"}
+            {isActive ? "STOP" :  "START"}
             </StyledButton>
         </TimerDisplay>
         <VolumeDisplay>
             <div
             style={{
-                float: "left",
+                float: "right",
                 height: "410px",
                 border: "2px solid black",
                 width: "50px",
-                marginLeft: "50px",
+                marginRight: "50px",
                 position: "relative",
                 overflow: "hidden"
             }}
@@ -294,8 +321,8 @@ function Timer({
                 height: "410px",
                 border: "2px solid black",
                 width: "50px",
-                float: "right",
-                marginRight: "50px",
+                float: "left",
+                marginLeft: "50px",
                 position: "relative"
             }}
             >
@@ -311,7 +338,7 @@ function Timer({
         <ScoreDisplay>
             SCORE: {score} {scoreEmoji()}
         </ScoreDisplay>
-        </div>
+        </>
     );
 }
 
