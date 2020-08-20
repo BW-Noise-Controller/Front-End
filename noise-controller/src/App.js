@@ -35,22 +35,9 @@ function App() {
 
     <Router>
 
-      
       <NavBar/>
 
       <Switch> 
-        
-        <Route
-          exact
-          path="/login"
-          component={props => <Login {...props} />}
-        />
-         
-        <Route 
-          exact
-          path='/signup'
-          component={props => <Signup {...props} />}
-        />
 
         {/* <Route 
           exact
@@ -58,6 +45,17 @@ function App() {
           component={props => <AnimalPage {...props} />}
         /> */}
 
+        <Route
+          exact
+          path="/signup"
+          component={props => <Signup {...props} />}
+        />
+
+        <Route
+          exact
+          path="/login"
+          component={props => <Login {...props} />}
+        />
 
         <Route
           exact
